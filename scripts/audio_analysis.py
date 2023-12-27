@@ -3,14 +3,15 @@ import os
 import matplotlib.pyplot as plt
 from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import ShortTermFeatures, MidTermFeatures
-from pyAudioAnalysis import audioAnalysis
 
 #Functions
 def short_term_feature_extraction(audio_path, output_dir):
     #Read audio file
     [Fs, x] = audioBasicIO.read_audio_file(audio_path)
+    print("Sample rate (Fs):", Fs)
+    print("Audio length:", len(x))
     #Extract short-term features
-    F, f_names = ShortTermFeatures.feature_extraction(x, Fs, 0.050*Fs, 0.025*Fs)
+    F, f_names = ShortTermFeatures.feature_extraction(x, Fs, 1024, 512)
     #Plot and save the first two features
     plt.figure(figsize=(10, 6))
     plt.subplot(2, 1, 1)
@@ -27,20 +28,13 @@ def short_term_feature_extraction(audio_path, output_dir):
     plt.close()
 
 def mid_term_feature_extraction(audio_path, output_dir):
-    MidTermFeatures.mid_feature_extraction_to_file(audio_path, 1.0, 1.0, 0.050, 0.050, os.path.join(output_dir, 'mid_term_features', os.path.basename(audio_path)), True, True)
+    MidTermFeatures.mid_feature_extraction(audio_path, 1.0, 1.0, 0.050, 0.050, os.path.join(output_dir, 'mid_term_features', os.path.basename(audio_path)), True, True)
 
 def spectrogram_extraction(audio_path, output_dir):
-    audioAnalysis.fileSpectrogramWrapper(input_file=audio_path, output_file=os.path.join(output_dir, 'spectrograms', os.path.basename(audio_path) + '_spectrogram.png'))
+    ShortTermFeatures.Spectrogram(input_file=audio_path, output_file=os.path.join(output_dir, 'spectrograms', os.path.basename(audio_path) + '_spectrogram.png'))
 
 def chromagram_extraction(audio_path, output_dir):
-    audioAnalysis.fileChromagramWrapper(input_file=audio_path, output_file=os.path.join(output_dir, 'chromagrams', os.path.basename(audio_path) + '_chromagram.png'))
-
-def beat_extraction(audio_path, output_dir):
-    [Fs, x] = audioBasicIO.read_audio_file(audio_path)
-    F, _ = ShortTermFeatures.feature_extraction(x, Fs, 0.050*Fs, 0.025*Fs)
-    beat, _ = MidTermFeatures.beat_extraction(F, 0.050)
-    with open(os.path.join(output_dir, 'beats', os.path.basename(audio_path) + '_beat.txt'), 'w') as f:
-        f.write(f'Beat: {beat}\n')
+    ShortTermFeatures.Chromagram(input_file=audio_path, output_file=os.path.join(output_dir, 'chromagrams', os.path.basename(audio_path) + '_chromagram.png'))
 
 #-----Looping through files-----
 def process_all_files(data_dir, output_dir):
@@ -56,7 +50,6 @@ def process_all_files(data_dir, output_dir):
             mid_term_feature_extraction(file_path, output_dir)
             spectrogram_extraction(file_path, output_dir)
             chromagram_extraction(file_path, output_dir)
-            beat_extraction(file_path, output_dir)
             print(f'Completed analysis for {file}')
 
 #----------Calling process----------

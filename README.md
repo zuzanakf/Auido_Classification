@@ -6,7 +6,6 @@
     ```
     git clone https://github.com/zuzanakf/Audio_Classification.git
     git clone https://github.com/tyiannak/pyAudioAnalysis.git
-    cd pyAudioAnalysis
     ```
 
 2. Create Virtual environment & activate
@@ -23,6 +22,7 @@
 
 3. Install Dependencies
     ```
+    cd pyAudioAnalysis
     pip install -r requirements.txt
     pip install -e .
     ```
